@@ -9,7 +9,7 @@ import (
 	"syscall"
 	"time"
 
-	"defi_api/internal/server"
+	"order_orbit/internal/server"
 )
 
 func gracefulShutdown(apiServer *http.Server, done chan bool) {

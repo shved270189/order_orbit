@@ -1,51 +1,53 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useState, useEffect } from 'react'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [users, setUsers] = useState([])
 
-  const fetchData = () => {
-    fetch(`http://localhost:${import.meta.env.VITE_PORT}/`)
-      .then(response => response.text())
-      .then(data => setMessage(data))
-      .catch(error => console.error('Error fetching data:', error))
-  }
-  const [message, setMessage] = useState<string>('')
+  useEffect(() => {
+    const fetchData = () => {
+      fetch(`http://localhost:${import.meta.env.VITE_PORT}/users`)
+        .then(response => response.text())
+        .then(data => setUsers(JSON.parse(data)))
+        .catch(error => console.error('Error fetching data:', error))
+    }
+    fetchData()
+  }, [])
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-      <button onClick={fetchData}>
-        Click to fetch from Go server
-      </button>
-      {message && (
+    <div className="row">
+      {users.length === 0 && (
         <div>
-          <h2>Server Response:</h2>
-          <p>{message}</p>
+          <h2>Loading...</h2>
         </div>
       )}
-    </>
+      {users.length > 0 && (
+        <table className="table table-striped">
+          <thead>
+            <tr>
+              <th scope="col">ID</th>
+              <th scope="col">Full Name</th>
+              <th scope="col">Login</th>
+              <th scope="col">Updated At</th>
+              <th scope="col">Created At</th>
+            </tr>
+          </thead>
+          <tbody>
+            {users.map((user) => {
+              return (
+                <tr key={user.id}>
+                  <th scope="row">{user.id}</th>
+                  <td>{user.full_name}</td>
+                  <td>{user.login}</td>
+                  <td>{user.updated_at}</td>
+                  <td>{user.created_at}</td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      )}
+    </div>
   )
 }
 

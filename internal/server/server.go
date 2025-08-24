@@ -9,7 +9,7 @@ import (
 
 	_ "github.com/joho/godotenv/autoload"
 
-	"defi_api/internal/database"
+	"order_orbit/internal/database"
 )
 
 type Server struct {
