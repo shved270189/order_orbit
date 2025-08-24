@@ -6,7 +6,7 @@ import (
 	entities "order_orbit/internal/entities"
 )
 
-func (s *service) AllUsers() []entities.User {
+func (s *service) Users() []entities.User {
 	var users []entities.User
 
 	result := s.db.Find(&users)
@@ -17,7 +17,7 @@ func (s *service) AllUsers() []entities.User {
 	return users
 }
 
-func (s *service) GetUserById(id string) entities.User {
+func (s *service) UserById(id string) entities.User {
 	var user entities.User
 	result := s.db.First(&user, id)
 

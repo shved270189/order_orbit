@@ -5,6 +5,8 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+
+	"order_orbit/internal/handlers"
 )
 
 func (s *Server) RegisterRoutes() http.Handler {
@@ -12,11 +14,11 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	r.Use(cors.Default())
 
-	r.GET("/users/:id", s.userHandler)
-	r.DELETE("/users/:id", s.deleteUserHandler)
-	r.PUT("/users/:id", s.updateUserHandler)
-	r.GET("/users", s.usersHandler)
-	r.POST("/users", s.createUserHandler)
+	r.GET("/users/:id", handlers.Users.Show)
+	r.DELETE("/users/:id", handlers.Users.Delete)
+	r.PUT("/users/:id", handlers.Users.Update)
+	r.GET("/users", handlers.Users.Index)
+	r.POST("/users", handlers.Users.Create)
 
 	return r
 }

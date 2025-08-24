@@ -12,8 +12,8 @@ import (
 )
 
 type Service interface {
-	AllUsers() []entities.User
-	GetUserById(string) entities.User
+	Users() []entities.User
+	UserById(string) entities.User
 	CreateUser(map[string]string) entities.User
 	DeleteUser(string)
 	UpdateUser(string, map[string]string) entities.User

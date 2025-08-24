@@ -1,7 +1,11 @@
 import { useState, useEffect } from 'react'
-import './App.css'
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import { NavLink } from "react-router";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEdit, faTrashCan, faEye } from '@fortawesome/free-regular-svg-icons';
 
-function App() {
+function Users() {
   const [users, setUsers] = useState([])
 
   useEffect(() => {
@@ -15,7 +19,8 @@ function App() {
   }, [])
 
   return (
-    <div className="row">
+    <Row>
+      <Col>
       {users.length === 0 && (
         <div>
           <h2>Loading...</h2>
@@ -30,6 +35,7 @@ function App() {
               <th scope="col">Login</th>
               <th scope="col">Updated At</th>
               <th scope="col">Created At</th>
+              <th scope="col">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -41,14 +47,26 @@ function App() {
                   <td>{user.login}</td>
                   <td>{user.updated_at}</td>
                   <td>{user.created_at}</td>
+                  <td>
+                    <NavLink className="link" to={`/user/${user.id}`}>
+                      <FontAwesomeIcon icon={faEye} />
+                    </NavLink>
+                    <NavLink className="link" to={`/user/${user.id}`}>
+                      <FontAwesomeIcon icon={faEdit} />
+                    </NavLink>
+                    <NavLink className="link" to={`/user/${user.id}`}>
+                      <FontAwesomeIcon icon={faTrashCan} />
+                    </NavLink>
+                  </td>
                 </tr>
               )
             })}
           </tbody>
         </table>
       )}
-    </div>
+      </Col>
+    </Row>
   )
 }
 
-export default App
+export default Users
