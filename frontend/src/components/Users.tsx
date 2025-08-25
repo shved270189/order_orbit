@@ -4,9 +4,18 @@ import Col from 'react-bootstrap/Col';
 import { NavLink } from "react-router";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faTrashCan, faEye } from '@fortawesome/free-regular-svg-icons';
+import Moment from 'moment';
+
+type User = {
+  id: number;
+  fullName: string;
+  login: string;
+  updatedAt: string;
+  createdAt: string;
+};
 
 function Users() {
-  const [users, setUsers] = useState([])
+  const [users, setUsers] = useState<User[]>([])
 
   useEffect(() => {
     const fetchData = () => {
@@ -43,10 +52,10 @@ function Users() {
               return (
                 <tr key={user.id}>
                   <th scope="row">{user.id}</th>
-                  <td>{user.full_name}</td>
+                  <td>{user.fullName}</td>
                   <td>{user.login}</td>
-                  <td>{user.updated_at}</td>
-                  <td>{user.created_at}</td>
+                  <td>{Moment(user.updatedAt).format('MMMM Do YYYY, h:mm:ss a')}</td>
+                  <td>{Moment(user.createdAt).format('MMMM Do YYYY, h:mm:ss a')}</td>
                   <td>
                     <NavLink className="link" to={`/user/${user.id}`}>
                       <FontAwesomeIcon icon={faEye} />
