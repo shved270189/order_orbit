@@ -9,7 +9,7 @@ import (
 	"order_orbit/internal/handlers"
 )
 
-func (s *Server) RegisterRoutes() http.Handler {
+func RegisterRoutes() http.Handler {
 	r := gin.Default()
 
 	r.Use(cors.Default())

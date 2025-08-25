@@ -18,7 +18,6 @@ type user struct {
 }
 
 var(
-	db = database.New()
 	Users = user{
 		Index: usersHandler,
 		Create: createUserHandler,
@@ -29,13 +28,13 @@ var(
 )
 
 func usersHandler(c *gin.Context) {
-	result := db.Users()
+	result := database.Users()
 
 	c.JSON(http.StatusOK, result)
 }
 
 func userHandler(c *gin.Context) {
-	result := db.UserById(c.Param("id"))
+	result := database.UserById(c.Param("id"))
 
 	c.JSON(http.StatusOK, result)
 }
@@ -43,20 +42,20 @@ func userHandler(c *gin.Context) {
 func createUserHandler(c *gin.Context) {
 	userAttr := map[string]string{"Login": c.PostForm("login"), "FullName": c.PostForm("full_name")}
 	log.Print(userAttr)
-	result := db.CreateUser(userAttr)
+	result := database.CreateUser(userAttr)
 
 	c.JSON(http.StatusCreated, result)
 }
 
 func deleteUserHandler(c *gin.Context) {
-	db.DeleteUser(c.Param("id"))
+	database.DeleteUser(c.Param("id"))
 	c.Status(http.StatusNoContent)
 }
 
 func updateUserHandler(c *gin.Context) {
 	userAttr := map[string]string{"FullName": c.PostForm("full_name")}
 	log.Print(userAttr)
-	result := db.UpdateUser(c.Param("id"), userAttr)
+	result := database.UpdateUser(c.Param("id"), userAttr)
 
 	c.JSON(http.StatusOK, result)
 }

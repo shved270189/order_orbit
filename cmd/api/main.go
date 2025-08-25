@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"order_orbit/internal/server"
+	"order_orbit/internal/database"
 )
 
 func gracefulShutdown(apiServer *http.Server, done chan bool) {
@@ -40,6 +41,9 @@ func gracefulShutdown(apiServer *http.Server, done chan bool) {
 func main() {
 
 	server := server.NewServer()
+
+	database.Connect()
+	defer database.Close()
 
 	// Create a done channel to signal when the shutdown is complete
 	done := make(chan bool, 1)

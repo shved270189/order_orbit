@@ -6,10 +6,10 @@ import (
 	entities "order_orbit/internal/entities"
 )
 
-func (s *service) Users() []entities.User {
+func Users() []entities.User {
 	var users []entities.User
 
-	result := s.db.Find(&users)
+	result := Conn.Find(&users)
 
 	if result.Error != nil {
 		log.Panic(result.Error)
@@ -17,9 +17,9 @@ func (s *service) Users() []entities.User {
 	return users
 }
 
-func (s *service) UserById(id string) entities.User {
+func UserById(id string) entities.User {
 	var user entities.User
-	result := s.db.First(&user, id)
+	result := Conn.First(&user, id)
 
 	if result.Error != nil {
 		log.Panic(result.Error)
@@ -27,32 +27,32 @@ func (s *service) UserById(id string) entities.User {
 	return user
 }
 
-func (s *service) CreateUser(attr map[string]string) entities.User {
+func CreateUser(attr map[string]string) entities.User {
 	user := entities.User{
 		Login:    attr["Login"],
 		FullName: attr["FullName"],
 	}
 
-	result := s.db.Create(&user)
+	result := Conn.Create(&user)
 	if result.Error != nil {
 		log.Panic(result.Error)
 	}
-	s.db.First(&user, user.ID)
+	Conn.First(&user, user.ID)
 	return user
 }
 
-func (s *service) DeleteUser(id string) {
+func DeleteUser(id string) {
 	var user entities.User
-	result := s.db.First(&user, id)
+	result := Conn.First(&user, id)
 	if result.Error != nil {
 		log.Panic(result.Error)
 	}
-	s.db.Delete(&user)
+	Conn.Delete(&user)
 }
 
-func (s *service) UpdateUser(id string, attr map[string]string) entities.User {
+func UpdateUser(id string, attr map[string]string) entities.User {
 	var user entities.User
-	result := s.db.First(&user, id)
+	result := Conn.First(&user, id)
 	if result.Error != nil {
 		log.Panic(result.Error)
 	}
@@ -61,6 +61,6 @@ func (s *service) UpdateUser(id string, attr map[string]string) entities.User {
 		user.FullName = newName
 	}
 
-	s.db.Save(&user)
+	Conn.Save(&user)
 	return user
 }

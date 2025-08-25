@@ -11,37 +11,38 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 )
 
-type Service interface {
-	Users() []entities.User
-	UserById(string) entities.User
-	CreateUser(map[string]string) entities.User
-	DeleteUser(string)
-	UpdateUser(string, map[string]string) entities.User
-}
-
-type service struct {
-	db *gorm.DB
-}
-
 var (
-	dburl      = os.Getenv("BLUEPRINT_DB_URL")
-	dbInstance *service
+	Conn *gorm.DB
 )
 
-func New() *service {
-	if dbInstance != nil {
-		return dbInstance
+func Connect() {
+	if Conn != nil {
+		return
 	}
 
-	db, err := gorm.Open(sqlite.Open(dburl), &gorm.Config{})
+	var err error
+	Conn, err = gorm.Open(sqlite.Open(os.Getenv("BLUEPRINT_DB_URL")), &gorm.Config{})
 	if err != nil {
 		log.Fatal(err)
 	}
+	log.Print("Connected to database")
 
-	db.AutoMigrate(&entities.User{})
+	runMigrations()
+}
 
-	dbInstance = &service{
-		db: db,
+func Close() {
+	if Conn != nil {
+		sqlDB, err := Conn.DB()
+		if err != nil {
+			log.Fatal(err)
+		}
+		sqlDB.Close()
+		log.Print("Disconnected from database")
 	}
-	return dbInstance
+}
+
+func runMigrations() {
+	log.Print("Migrating database")
+	Conn.AutoMigrate(&entities.User{})
+	log.Print("Migration completed")
 }
