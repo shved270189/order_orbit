@@ -6,56 +6,45 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"order_orbit/internal/database"
+	"order_orbit/internal/storage"
 )
 
-type user struct {
-	Index gin.HandlerFunc
-	Create gin.HandlerFunc
-	Update gin.HandlerFunc
-	Delete gin.HandlerFunc
-	Show gin.HandlerFunc
+type usersHandler struct {
 }
 
-var(
-	Users = user{
-		Index: usersHandler,
-		Create: createUserHandler,
-		Update: updateUserHandler,
-		Delete: deleteUserHandler,
-		Show: userHandler,
-	}
+var (
+	Users = usersHandler{}
 )
 
-func usersHandler(c *gin.Context) {
-	result := database.Users()
+func (h *usersHandler) Index(c *gin.Context) {
+	result := storage.Users.All()
 
 	c.JSON(http.StatusOK, result)
 }
 
-func userHandler(c *gin.Context) {
-	result := database.UserById(c.Param("id"))
+func (h *usersHandler) Show(c *gin.Context) {
+	result := storage.Users.Find(c.Param("id"))
 
 	c.JSON(http.StatusOK, result)
 }
 
-func createUserHandler(c *gin.Context) {
+func (h *usersHandler) Create(c *gin.Context) {
 	userAttr := map[string]string{"Login": c.PostForm("login"), "FullName": c.PostForm("full_name")}
 	log.Print(userAttr)
-	result := database.CreateUser(userAttr)
+	result := storage.Users.Create(userAttr)
 
 	c.JSON(http.StatusCreated, result)
 }
 
-func deleteUserHandler(c *gin.Context) {
-	database.DeleteUser(c.Param("id"))
+func (h *usersHandler) Destroy(c *gin.Context) {
+	storage.Users.Delete(c.Param("id"))
 	c.Status(http.StatusNoContent)
 }
 
-func updateUserHandler(c *gin.Context) {
+func (h *usersHandler) Update(c *gin.Context) {
 	userAttr := map[string]string{"FullName": c.PostForm("full_name")}
 	log.Print(userAttr)
-	result := database.UpdateUser(c.Param("id"), userAttr)
+	result := storage.Users.Update(c.Param("id"), userAttr)
 
 	c.JSON(http.StatusOK, result)
 }

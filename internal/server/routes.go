@@ -15,7 +15,7 @@ func RegisterRoutes() http.Handler {
 	r.Use(cors.Default())
 
 	r.GET("/users/:id", handlers.Users.Show)
-	r.DELETE("/users/:id", handlers.Users.Delete)
+	r.DELETE("/users/:id", handlers.Users.Destroy)
 	r.PUT("/users/:id", handlers.Users.Update)
 	r.GET("/users", handlers.Users.Index)
 	r.POST("/users", handlers.Users.Create)
