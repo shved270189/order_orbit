@@ -1,0 +1,96 @@
+import { useState, useEffect } from 'react'
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import { NavLink } from "react-router";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEdit, faTrashCan, faEye } from '@fortawesome/free-regular-svg-icons';
+import Moment from 'moment';
+import axios from 'axios';
+
+type User = {
+  id: number;
+  fullName: string;
+  login: string;
+  updatedAt: string;
+  createdAt: string;
+};
+
+function Users() {
+  const [users, setUsers] = useState<User[]>([])
+
+  useEffect(() => {
+    const fetchData = () => {
+      axios.get(`${import.meta.env.VITE_API_BASE_URL}/users`)
+        .then(response => response.data)
+        .then(data => setUsers(data))
+        .catch(error => console.error('Error fetching data:', error))
+    }
+    fetchData()
+  }, [])
+
+  return (
+    <>
+      <Row>
+        <Col>
+          <h2>Users</h2>
+        </Col>
+        <Col className="d-grid gap-2 d-md-flex justify-content-md-end">
+          <NavLink to={`/users/new`}>
+            <button type="button" className="btn btn-primary">Add New</button>
+          </NavLink>
+        </Col>
+      </Row>
+      <Row>
+        <Col>
+        {users.length === 0 && (
+          <div>
+            <h2>Loading...</h2>
+          </div>
+        )}
+        {users.length > 0 && (
+          <table className="table table-striped">
+            <thead>
+              <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Full Name</th>
+                <th scope="col">Login</th>
+                <th scope="col">Updated At</th>
+                <th scope="col">Created At</th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {users.map((user) => {
+                return (
+                  <tr key={user.id}>
+                    <th scope="row">
+                      <NavLink className="link" to={`/users/${user.id}`}>{user.id}</NavLink>
+                    </th>
+                    <td>{user.fullName}</td>
+                    <td>{user.login}</td>
+                    <td>{Moment(user.updatedAt).format('MMMM Do YYYY, h:mm:ss a')}</td>
+                    <td>{Moment(user.createdAt).format('MMMM Do YYYY, h:mm:ss a')}</td>
+                    <td>
+                      <NavLink className="link" to={`/users/${user.id}`}>
+                        <FontAwesomeIcon icon={faEye} />
+                      </NavLink>
+                      <NavLink className="link" to={`/users/${user.id}`}>
+                        <FontAwesomeIcon icon={faEdit} />
+                      </NavLink>
+                      <NavLink className="link" to={`/users/${user.id}`}>
+                        <FontAwesomeIcon icon={faTrashCan} />
+                      </NavLink>
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        )}
+        </Col>
+      </Row>
+    </>
+  )
+}
+
+export default Users
