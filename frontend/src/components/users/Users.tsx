@@ -48,7 +48,7 @@ function Users() {
         </Col>
         <Col className="d-grid gap-2 d-md-flex justify-content-md-end">
           <NavLink to={`/users/new`}>
-            <button type="button" className="btn btn-primary">Add New</button>
+            <Button variant="primary">Add New</Button>
           </NavLink>
         </Col>
       </Row>
