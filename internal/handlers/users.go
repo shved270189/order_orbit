@@ -13,7 +13,11 @@ type usersHandler struct {
 }
 
 type userCreateParams struct {
-	Login    string `form:"login" binding:"required"`
+	userUpdateParams
+	Login string `form:"login" binding:"required"`
+}
+
+type userUpdateParams struct {
 	FullName string `form:"fullName" binding:"required"`
 }
 
@@ -40,7 +44,12 @@ func (h *usersHandler) Create(c *gin.Context) {
 		return
 	}
 	log.Print(params)
-	result := storage.Users.Create(map[string]string{"Login": params.Login, "FullName": params.FullName})
+	result := storage.Users.Create(
+		map[string]any{
+			"Login":    params.Login,
+			"FullName": params.FullName,
+		},
+	)
 
 	c.JSON(http.StatusCreated, result)
 }
@@ -51,9 +60,14 @@ func (h *usersHandler) Destroy(c *gin.Context) {
 }
 
 func (h *usersHandler) Update(c *gin.Context) {
-	userAttr := map[string]string{"FullName": c.PostForm("full_name")}
-	log.Print(userAttr)
-	result := storage.Users.Update(c.Param("id"), userAttr)
+	var params userUpdateParams
+	if err := c.ShouldBind(&params); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	log.Print(params)
+
+	result := storage.Users.Update(c.Param("id"), map[string]any{"FullName": params.FullName})
 
 	c.JSON(http.StatusOK, result)
 }

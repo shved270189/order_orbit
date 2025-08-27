@@ -64,8 +64,8 @@ function Users() {
             <thead>
               <tr>
                 <th scope="col">ID</th>
-                <th scope="col">Full Name</th>
                 <th scope="col">Login</th>
+                <th scope="col">Full Name</th>
                 <th scope="col">Updated At</th>
                 <th scope="col">Created At</th>
                 <th scope="col">Actions</th>
@@ -78,8 +78,8 @@ function Users() {
                     <th scope="row">
                       <NavLink className="link" to={`/users/${user.id}`}>{user.id}</NavLink>
                     </th>
-                    <td>{user.fullName}</td>
                     <td>{user.login}</td>
+                    <td>{user.fullName}</td>
                     <td>{Moment(user.updatedAt).format('MMMM Do YYYY, h:mm:ss a')}</td>
                     <td>{Moment(user.createdAt).format('MMMM Do YYYY, h:mm:ss a')}</td>
                     <td>
@@ -88,7 +88,7 @@ function Users() {
                           <FontAwesomeIcon icon={faEye} />
                         </Button>
                       </NavLink>
-                      <NavLink to={`/users/${user.id}`}>
+                      <NavLink to={`/users/${user.id}/edit`}>
                         <Button variant="link">
                           <FontAwesomeIcon icon={faEdit} />
                         </Button>

@@ -35,12 +35,11 @@ func (s *usersStorage) Find(id string) entities.User {
 	return user
 }
 
-func (s *usersStorage) Create(attr map[string]string) entities.User {
+func (s *usersStorage) Create(attrs map[string]any) entities.User {
 	user := entities.User{
-		Login:    attr["Login"],
-		FullName: attr["FullName"],
+		Login:    attrs["Login"].(string),
+		FullName: attrs["FullName"].(string),
 	}
-
 	result := database.Conn.Create(&user)
 	if result.Error != nil {
 		log.Panic(result.Error)
@@ -58,16 +57,14 @@ func (s *usersStorage) Delete(id string) {
 	database.Conn.Delete(&user)
 }
 
-func (s *usersStorage) Update(id string, attr map[string]string) entities.User {
+func (s *usersStorage) Update(id string, attrs map[string]any) entities.User {
 	var user entities.User
 	result := database.Conn.First(&user, id)
 	if result.Error != nil {
 		log.Panic(result.Error)
 	}
 
-	if newName, ok := attr["FullName"]; ok {
-		user.FullName = newName
-	}
+	user.FullName = attrs["FullName"].(string)
 
 	database.Conn.Save(&user)
 	return user

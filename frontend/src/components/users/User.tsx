@@ -18,14 +18,15 @@ function User() {
   const [user, setUser] = useState<User | null>(null)
   const { userId } = useParams<{ userId: string }>()
 
+
   useEffect(() => {
-    const fetchData = () => {
+    const fetchUser = () => {
       axios.get(`${import.meta.env.VITE_API_BASE_URL}/users/${userId}`)
         .then(response => response.data)
         .then(data => setUser(data))
         .catch(error => console.error('Error fetching data:', error))
     }
-    fetchData()
+    fetchUser()
   }, [userId])
 
   return (
