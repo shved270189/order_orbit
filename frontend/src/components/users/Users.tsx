@@ -6,6 +6,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faTrashCan, faEye } from '@fortawesome/free-regular-svg-icons';
 import Moment from 'moment';
 import axios from 'axios';
+import { Button } from 'react-bootstrap';
+import Modal from 'react-bootstrap/Modal';
 
 type User = {
   id: number;
@@ -17,14 +19,24 @@ type User = {
 
 function Users() {
   const [users, setUsers] = useState<User[]>([])
+  const [userForDelete, setUserForDelete] = useState<User | null>(null);
+  const fetchData = () => {
+    axios.get(`${import.meta.env.VITE_API_BASE_URL}/users`)
+      .then(response => response.data)
+      .then(data => setUsers(data))
+      .catch(error => console.error('Error fetching data:', error))
+  }
+  const deleteUser = (user: User) => {
+    axios.delete(`${import.meta.env.VITE_API_BASE_URL}/users/${user.id}`)
+      .then(() => {
+        setUsers(users.filter(u => u.id !== user.id));
+        setUserForDelete(null);
+        fetchData();
+      })
+      .catch(error => console.error('Error deleting user:', error));
+  }
 
   useEffect(() => {
-    const fetchData = () => {
-      axios.get(`${import.meta.env.VITE_API_BASE_URL}/users`)
-        .then(response => response.data)
-        .then(data => setUsers(data))
-        .catch(error => console.error('Error fetching data:', error))
-    }
     fetchData()
   }, [])
 
@@ -71,15 +83,19 @@ function Users() {
                     <td>{Moment(user.updatedAt).format('MMMM Do YYYY, h:mm:ss a')}</td>
                     <td>{Moment(user.createdAt).format('MMMM Do YYYY, h:mm:ss a')}</td>
                     <td>
-                      <NavLink className="link" to={`/users/${user.id}`}>
-                        <FontAwesomeIcon icon={faEye} />
+                      <NavLink to={`/users/${user.id}`}>
+                        <Button variant="link">
+                          <FontAwesomeIcon icon={faEye} />
+                        </Button>
                       </NavLink>
-                      <NavLink className="link" to={`/users/${user.id}`}>
-                        <FontAwesomeIcon icon={faEdit} />
+                      <NavLink to={`/users/${user.id}`}>
+                        <Button variant="link">
+                          <FontAwesomeIcon icon={faEdit} />
+                        </Button>
                       </NavLink>
-                      <NavLink className="link" to={`/users/${user.id}`}>
+                      <Button variant="link" onClick={() => setUserForDelete(user)}>
                         <FontAwesomeIcon icon={faTrashCan} />
-                      </NavLink>
+                      </Button>
                     </td>
                   </tr>
                 )
@@ -89,6 +105,22 @@ function Users() {
         )}
         </Col>
       </Row>
+      {userForDelete && (
+        <Modal show={!!userForDelete} onHide={() => setUserForDelete(null)}>
+          <Modal.Header closeButton>
+            <Modal.Title>Confirm Deletion</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>Are you sure you want to delete user "{userForDelete.fullName} ({userForDelete.login})"?</Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setUserForDelete(null)}>
+              Close
+            </Button>
+            <Button variant="danger" onClick={() => deleteUser(userForDelete)}>
+              Delete User
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      )}
     </>
   )
 }

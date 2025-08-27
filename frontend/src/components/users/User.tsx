@@ -4,6 +4,7 @@ import Col from 'react-bootstrap/Col';
 import Moment from 'moment';
 import {useParams} from "react-router";
 import axios from 'axios';
+import BackButton from '../common/BackButton';
 
 type User = {
   id: number;
@@ -28,6 +29,8 @@ function User() {
   }, [userId])
 
   return (
+    <>
+    <BackButton to="/users" />
     <Row>
       <Col>
       {user === null && (
@@ -45,6 +48,7 @@ function User() {
       )}
       </Col>
     </Row>
+    </>
   )
 }
 
