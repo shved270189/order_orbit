@@ -8,6 +8,7 @@ import (
 
 	"order_orbit/internal/database"
 	"order_orbit/internal/handlers"
+	"order_orbit/internal/services"
 	"order_orbit/internal/storage"
 )
 
@@ -16,7 +17,11 @@ func registerRoutes(dbConnection *database.Connection) http.Handler {
 
 	r.Use(cors.Default())
 
-	userHandler := handlers.NewUserHandler(storage.NewUserStorage(dbConnection.DB()))
+	userHandler := handlers.NewUserHandler(
+		services.NewUserService(
+			storage.NewUserStorage(dbConnection.DB()),
+		),
+	)
 	r.GET("/users/:id", userHandler.Show)
 	r.DELETE("/users/:id", userHandler.Destroy)
 	r.PUT("/users/:id", userHandler.Update)

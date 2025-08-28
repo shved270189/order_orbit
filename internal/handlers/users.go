@@ -6,28 +6,27 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"order_orbit/internal/storage"
+	"order_orbit/internal/services"
 )
 
 type UserHandler struct {
-	storage *storage.User
+	service *services.UserService
 }
 
-func NewUserHandler(storage *storage.User) *UserHandler {
+func NewUserHandler(service *services.UserService) *UserHandler {
 	return &UserHandler{
-		storage: storage,
+		service: service,
 	}
 }
 
 func (h *UserHandler) Index(c *gin.Context) {
-	result := h.storage.All()
+	result := h.service.FetchAll()
 
 	c.JSON(http.StatusOK, result)
 }
 
 func (h *UserHandler) Show(c *gin.Context) {
-	result := h.storage.Find(c.Param("id"))
-
+	result := h.service.FetchById(c.Param("id"))
 	c.JSON(http.StatusOK, result)
 }
 
@@ -40,7 +39,7 @@ func (h *UserHandler) Create(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	result := h.storage.Create(
+	result := h.service.Create(
 		map[string]any{
 			"Login":    params.Login,
 			"FullName": params.FullName,
@@ -51,7 +50,7 @@ func (h *UserHandler) Create(c *gin.Context) {
 }
 
 func (h *UserHandler) Destroy(c *gin.Context) {
-	h.storage.Delete(c.Param("id"))
+	h.service.Delete(c.Param("id"))
 	c.Status(http.StatusNoContent)
 }
 
@@ -65,7 +64,7 @@ func (h *UserHandler) Update(c *gin.Context) {
 	}
 	log.Print(params)
 
-	result := h.storage.Update(c.Param("id"), map[string]any{"FullName": params.FullName})
+	result := h.service.Update(c.Param("id"), map[string]any{"FullName": params.FullName})
 
 	c.JSON(http.StatusOK, result)
 }

@@ -8,15 +8,15 @@ import (
 	"order_orbit/internal/entities"
 )
 
-type User struct {
+type UserStorage struct {
 	db *gorm.DB
 }
 
-func NewUserStorage(db *gorm.DB) *User {
-	return &User{db: db}
+func NewUserStorage(db *gorm.DB) *UserStorage {
+	return &UserStorage{db: db}
 }
 
-func (s *User) All() []entities.User {
+func (s *UserStorage) All() []entities.User {
 	var users []entities.User
 
 	result := s.db.Find(&users)
@@ -27,7 +27,7 @@ func (s *User) All() []entities.User {
 	return users
 }
 
-func (s *User) Find(id string) entities.User {
+func (s *UserStorage) Find(id string) entities.User {
 	var user entities.User
 	result := s.db.First(&user, id)
 
@@ -37,7 +37,7 @@ func (s *User) Find(id string) entities.User {
 	return user
 }
 
-func (s *User) Create(attrs map[string]any) entities.User {
+func (s *UserStorage) Create(attrs map[string]any) entities.User {
 	user := entities.User{
 		Login:    attrs["Login"].(string),
 		FullName: attrs["FullName"].(string),
@@ -50,7 +50,7 @@ func (s *User) Create(attrs map[string]any) entities.User {
 	return user
 }
 
-func (s *User) Delete(id string) {
+func (s *UserStorage) Delete(id string) {
 	var user entities.User
 	result := s.db.First(&user, id)
 	if result.Error != nil {
@@ -59,7 +59,7 @@ func (s *User) Delete(id string) {
 	s.db.Delete(&user)
 }
 
-func (s *User) Update(id string, attrs map[string]any) entities.User {
+func (s *UserStorage) Update(id string, attrs map[string]any) entities.User {
 	var user entities.User
 	result := s.db.First(&user, id)
 	if result.Error != nil {
