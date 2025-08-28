@@ -5,15 +5,16 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
-	"order_orbit/internal/server"
 	"order_orbit/internal/database"
+	"order_orbit/internal/server"
 )
 
-func gracefulShutdown(apiServer *http.Server, done chan bool) {
+func gracefulShutdown(apiServer *server.Server, done chan bool) {
 	// Create context that listens for the interrupt signal from the OS.
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
@@ -39,19 +40,19 @@ func gracefulShutdown(apiServer *http.Server, done chan bool) {
 }
 
 func main() {
+	dbConnection := database.New(os.Getenv("BLUEPRINT_DB_URL"))
+	defer dbConnection.Close()
+	dbConnection.RunMigrations()
 
-	server := server.NewServer()
-
-	database.Connect()
-	defer database.Close()
+	apiServer := server.New(dbConnection)
 
 	// Create a done channel to signal when the shutdown is complete
 	done := make(chan bool, 1)
 
 	// Run graceful shutdown in a separate goroutine
-	go gracefulShutdown(server, done)
+	go gracefulShutdown(apiServer, done)
 
-	err := server.ListenAndServe()
+	err := apiServer.ListenAndServe()
 	if err != nil && err != http.ErrServerClosed {
 		panic(fmt.Sprintf("http server error: %s", err))
 	}

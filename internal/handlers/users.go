@@ -9,42 +9,38 @@ import (
 	"order_orbit/internal/storage"
 )
 
-type usersHandler struct {
+type UserHandler struct {
+	storage *storage.User
 }
 
-type userCreateParams struct {
-	userUpdateParams
-	Login string `form:"login" binding:"required"`
+func NewUserHandler(storage *storage.User) *UserHandler {
+	return &UserHandler{
+		storage: storage,
+	}
 }
 
-type userUpdateParams struct {
-	FullName string `form:"fullName" binding:"required"`
-}
-
-var (
-	Users = usersHandler{}
-)
-
-func (h *usersHandler) Index(c *gin.Context) {
-	result := storage.Users.All()
+func (h *UserHandler) Index(c *gin.Context) {
+	result := h.storage.All()
 
 	c.JSON(http.StatusOK, result)
 }
 
-func (h *usersHandler) Show(c *gin.Context) {
-	result := storage.Users.Find(c.Param("id"))
+func (h *UserHandler) Show(c *gin.Context) {
+	result := h.storage.Find(c.Param("id"))
 
 	c.JSON(http.StatusOK, result)
 }
 
-func (h *usersHandler) Create(c *gin.Context) {
-	var params userCreateParams
+func (h *UserHandler) Create(c *gin.Context) {
+	var params struct {
+		Login    string `json:"login" binding:"required"`
+		FullName string `json:"fullName" binding:"required"`
+	}
 	if err := c.ShouldBind(&params); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	log.Print(params)
-	result := storage.Users.Create(
+	result := h.storage.Create(
 		map[string]any{
 			"Login":    params.Login,
 			"FullName": params.FullName,
@@ -54,20 +50,22 @@ func (h *usersHandler) Create(c *gin.Context) {
 	c.JSON(http.StatusCreated, result)
 }
 
-func (h *usersHandler) Destroy(c *gin.Context) {
-	storage.Users.Delete(c.Param("id"))
+func (h *UserHandler) Destroy(c *gin.Context) {
+	h.storage.Delete(c.Param("id"))
 	c.Status(http.StatusNoContent)
 }
 
-func (h *usersHandler) Update(c *gin.Context) {
-	var params userUpdateParams
+func (h *UserHandler) Update(c *gin.Context) {
+	var params struct {
+		FullName string `json:"fullName" binding:"required"`
+	}
 	if err := c.ShouldBind(&params); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	log.Print(params)
 
-	result := storage.Users.Update(c.Param("id"), map[string]any{"FullName": params.FullName})
+	result := h.storage.Update(c.Param("id"), map[string]any{"FullName": params.FullName})
 
 	c.JSON(http.StatusOK, result)
 }

@@ -3,21 +3,23 @@ package storage
 import (
 	"log"
 
-	"order_orbit/internal/database"
+	"gorm.io/gorm"
+
 	"order_orbit/internal/entities"
 )
 
-type usersStorage struct {
+type User struct {
+	db *gorm.DB
 }
 
-var (
-	Users = usersStorage{}
-)
+func NewUserStorage(db *gorm.DB) *User {
+	return &User{db: db}
+}
 
-func (s *usersStorage) All() []entities.User {
+func (s *User) All() []entities.User {
 	var users []entities.User
 
-	result := database.Conn.Find(&users)
+	result := s.db.Find(&users)
 
 	if result.Error != nil {
 		log.Panic(result.Error)
@@ -25,9 +27,9 @@ func (s *usersStorage) All() []entities.User {
 	return users
 }
 
-func (s *usersStorage) Find(id string) entities.User {
+func (s *User) Find(id string) entities.User {
 	var user entities.User
-	result := database.Conn.First(&user, id)
+	result := s.db.First(&user, id)
 
 	if result.Error != nil {
 		log.Panic(result.Error)
@@ -35,37 +37,37 @@ func (s *usersStorage) Find(id string) entities.User {
 	return user
 }
 
-func (s *usersStorage) Create(attrs map[string]any) entities.User {
+func (s *User) Create(attrs map[string]any) entities.User {
 	user := entities.User{
 		Login:    attrs["Login"].(string),
 		FullName: attrs["FullName"].(string),
 	}
-	result := database.Conn.Create(&user)
+	result := s.db.Create(&user)
 	if result.Error != nil {
 		log.Panic(result.Error)
 	}
-	database.Conn.First(&user, user.ID)
+	s.db.First(&user, user.ID)
 	return user
 }
 
-func (s *usersStorage) Delete(id string) {
+func (s *User) Delete(id string) {
 	var user entities.User
-	result := database.Conn.First(&user, id)
+	result := s.db.First(&user, id)
 	if result.Error != nil {
 		log.Panic(result.Error)
 	}
-	database.Conn.Delete(&user)
+	s.db.Delete(&user)
 }
 
-func (s *usersStorage) Update(id string, attrs map[string]any) entities.User {
+func (s *User) Update(id string, attrs map[string]any) entities.User {
 	var user entities.User
-	result := database.Conn.First(&user, id)
+	result := s.db.First(&user, id)
 	if result.Error != nil {
 		log.Panic(result.Error)
 	}
 
 	user.FullName = attrs["FullName"].(string)
 
-	database.Conn.Save(&user)
+	s.db.Save(&user)
 	return user
 }

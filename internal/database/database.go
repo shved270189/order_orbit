@@ -1,48 +1,46 @@
 package database
 
 import (
-	"gorm.io/driver/sqlite"
-	"gorm.io/gorm"
 	"log"
-	"os"
-
-	entities "order_orbit/internal/entities"
 
 	_ "github.com/joho/godotenv/autoload"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
+
+	"order_orbit/internal/entities"
 )
 
-var (
-	Conn *gorm.DB
-)
+type Connection struct {
+	db *gorm.DB
+}
 
-func Connect() {
-	if Conn != nil {
-		return
-	}
-
-	var err error
-	Conn, err = gorm.Open(sqlite.Open(os.Getenv("BLUEPRINT_DB_URL")), &gorm.Config{})
+func New(dbUrl string) *Connection {
+	connection, err := gorm.Open(sqlite.Open(dbUrl), &gorm.Config{})
 	if err != nil {
 		log.Fatal(err)
 	}
 	log.Print("Connected to database")
-
-	runMigrations()
+	return &Connection{db: connection}
 }
 
-func Close() {
-	if Conn != nil {
-		sqlDB, err := Conn.DB()
-		if err != nil {
-			log.Fatal(err)
-		}
-		sqlDB.Close()
-		log.Print("Disconnected from database")
+func (c *Connection) DB() *gorm.DB {
+	return c.db
+}
+
+func (c *Connection) Close() {
+	if c.db == nil {
+		return
 	}
+	sqlDB, err := c.db.DB()
+	if err != nil {
+		log.Fatal(err)
+	}
+	sqlDB.Close()
+	log.Print("Disconnected from database")
 }
 
-func runMigrations() {
+func (c *Connection) RunMigrations() {
 	log.Print("Migrating database")
-	Conn.AutoMigrate(&entities.User{})
+	c.db.AutoMigrate(&entities.User{})
 	log.Print("Migration completed")
 }
