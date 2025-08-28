@@ -15,17 +15,16 @@ type User = {
 function User() {
   const [userAttrs, setUserAttrs] = useState<User>({ fullName: '', login: '' });
   const navigate = useNavigate();
-  const createUser = () => {
+  const createUser = async () => {
     console.log('User Attrs:', userAttrs);
-    axios.post(`${import.meta.env.VITE_API_BASE_URL}/users`, userAttrs)
-      .then(response => {
-        console.log('User created:', response.data);
-        navigate(`/users/${response.data.id}`);
-      })
-      .catch(error => {
-        console.error('Error creating user:', error);
-      });
-  }
+    try {
+      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/users`, userAttrs);
+      console.log('User created:', response.data);
+      navigate(`/users/${response.data.id}`);
+    } catch (error) {
+      console.error('Error creating user:', error);
+    }
+  };
 
   return (
     <>
