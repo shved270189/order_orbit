@@ -7,42 +7,38 @@ import { useNavigate } from "react-router";
 import { useState, useEffect } from 'react'
 import BackButton from '../common/BackButton';
 import {useParams} from "react-router";
-
-type User = {
-  id: number;
-  fullName: string;
-  login: string;
-  updatedAt: string;
-  createdAt: string;
-};
+import type { User } from '../../entities/user';
 
 function User() {
   const { userId } = useParams<{ userId: string }>()
   const [user, setUser] = useState<User | null>(null);
   const navigate = useNavigate();
-  const updateUser = () => {
+  const updateUser = async () => {
     console.log('User:', user);
 
-    if (!user) return;
+    if (!user) {
+      console.error('No user data to update.');
+      return;
+    }
 
-    axios.put(`${import.meta.env.VITE_API_BASE_URL}/users/${user.id}`, user)
-      .then(response => {
-        console.log('User updated:', response.data);
-        navigate(`/users/${response.data.id}`);
-      })
-      .catch(error => {
-        console.error('Error updating user:', error);
-      });
+    try {
+      const response = await axios.put(`${import.meta.env.VITE_API_BASE_URL}/users/${user.id}`, user);
+      console.log('User updated:', response.data);
+      navigate(`/users/${response.data.id}`);
+    } catch (error) {
+      console.error('Error updating user:', error);
+    }
   }
 
   useEffect(() => {
-    const fetchUser = () => {
-      axios.get(`${import.meta.env.VITE_API_BASE_URL}/users/${userId}`)
-        .then(response => response.data)
-        .then(data => setUser(data))
-        .catch(error => console.error('Error fetching data:', error))
-    }
-    fetchUser()
+    (async () => {
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/users/${userId}`)
+        setUser(response.data)
+      } catch (error) {
+        console.error('Error fetching user:', error);
+      }
+    })();
   }, [userId])
 
   return (

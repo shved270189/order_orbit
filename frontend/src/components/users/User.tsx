@@ -9,27 +9,21 @@ import { NavLink } from "react-router";
 import { Button } from 'react-bootstrap';
 import { useNavigate } from "react-router";
 import Modal from 'react-bootstrap/Modal';
-
-type User = {
-  id: number;
-  fullName: string;
-  login: string;
-  updatedAt: string;
-  createdAt: string;
-};
+import type { User } from '../../entities/user';
 
 function User() {
   const { userId } = useParams<{ userId: string }>();
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const [showDeletePrompt, setShowDeletePrompt] = useState(false);
-  const deleteUser = () => {
-    axios.delete(`${import.meta.env.VITE_API_BASE_URL}/users/${userId}`)
-      .then(() => {
-        setShowDeletePrompt(false);
-        navigate('/users');
-      })
-      .catch(error => console.error('Error deleting user:', error));
+  const deleteUser = async () => {
+    try {
+      await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/users/${userId}`);
+      setShowDeletePrompt(false);
+      navigate('/users');
+    } catch (error) {
+      console.error('Error deleting user:', error);
+    }
   }
 
   useEffect(() => {

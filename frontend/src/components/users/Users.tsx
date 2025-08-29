@@ -8,36 +8,34 @@ import Moment from 'moment';
 import axios from 'axios';
 import { Button } from 'react-bootstrap';
 import Modal from 'react-bootstrap/Modal';
-
-type User = {
-  id: number;
-  fullName: string;
-  login: string;
-  updatedAt: string;
-  createdAt: string;
-};
+import type { User } from '../../entities/user';
 
 function Users() {
   const [users, setUsers] = useState<User[]>([])
   const [userForDelete, setUserForDelete] = useState<User | null>(null);
-  const fetchData = () => {
-    axios.get(`${import.meta.env.VITE_API_BASE_URL}/users`)
-      .then(response => response.data)
-      .then(data => setUsers(data))
-      .catch(error => console.error('Error fetching data:', error))
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/users`);
+      setUsers(response.data);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
   }
-  const deleteUser = (user: User) => {
-    axios.delete(`${import.meta.env.VITE_API_BASE_URL}/users/${user.id}`)
-      .then(() => {
-        setUsers(users.filter(u => u.id !== user.id));
-        setUserForDelete(null);
-        fetchData();
-      })
-      .catch(error => console.error('Error deleting user:', error));
+  const deleteUser = async (user: User) => {
+    try {
+      await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/users/${user.id}`);
+      setUsers(users.filter(u => u.id !== user.id));
+      setUserForDelete(null);
+      fetchData();
+    } catch (error) {
+      console.error('Error deleting user:', error);
+    }
   }
 
   useEffect(() => {
-    fetchData()
+    (async () => {
+      await fetchData();
+    })();
   }, [])
 
   return (

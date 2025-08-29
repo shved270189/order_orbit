@@ -6,14 +6,11 @@ import axios from 'axios';
 import { useNavigate } from "react-router";
 import { useState } from 'react'
 import BackButton from '../common/BackButton';
+import type { User } from '../../entities/user';
 
-type User = {
-  fullName: string;
-  login: string;
-};
 
 function User() {
-  const [userAttrs, setUserAttrs] = useState<User>({ fullName: '', login: '' });
+  const [userAttrs, setUserAttrs] = useState<Partial<User>>({});
   const navigate = useNavigate();
   const createUser = async () => {
     console.log('User Attrs:', userAttrs);
