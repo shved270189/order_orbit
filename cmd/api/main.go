@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
+	"order_orbit/internal/config"
 	"order_orbit/internal/database"
 	"order_orbit/internal/server"
 )
@@ -40,7 +40,10 @@ func gracefulShutdown(apiServer *server.Server, done chan bool) {
 }
 
 func main() {
-	dbConnection := database.New(os.Getenv("BLUEPRINT_DB_URL"))
+	config := config.Load("")
+	log.Printf("Starting server in %s mode on port %s", config.AppEnv, config.Port)
+
+	dbConnection := database.New(config.DatabaseURL)
 	defer dbConnection.Close()
 	dbConnection.RunMigrations()
 

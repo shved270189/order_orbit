@@ -3,7 +3,6 @@ package database
 import (
 	"log"
 
-	_ "github.com/joho/godotenv/autoload"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 
